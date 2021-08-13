@@ -147,18 +147,18 @@ def animate_lattice(trials, lattice, L, temp, lat_type, file_title):
         if t % 1 == 0:
             lat_im.set_data(lattice)
             plt.draw()
-        if (t == 0) or (t % 25 == 0):
+        if (t == 0) or (t % 100 == 0):
             plt.savefig(f"{file_title}-{t}")
         lattice = update_lat(lattice, L, temp, lat_type)
         plt.pause(.05)
         t += 1
-    
-    return lattice
+    val = (np.sum(lattice)/(len(lattice)**2))
+    return lattice, val
 
 def update_lat(lattice, L, temp, lat_type):
     if lat_type == 'donut':
         lattice = lattice_donut(lattice, L, temp)
-    elif lat_type == 'ipositive':
+    elif lat_type == 'positive':
         lattice == pos_lattice(lattice, L, temp)
     elif lat_type == 'negative':
         lattice == neg_lattice(lattice, L, temp)
