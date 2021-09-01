@@ -159,10 +159,10 @@ def update_lat(lattice, L, temp, lat_type):
     if lat_type == 'donut':
         lattice = lattice_donut(lattice, L, temp)
     elif lat_type == 'positive':
-        lattice == pos_lattice(lattice, L, temp)
+        lattice = pos_lattice(lattice, L, temp)
     elif lat_type == 'negative':
-        lattice == neg_lattice(lattice, L, temp)
+        lattice = neg_lattice(lattice, L, temp)
     else:
-        lattice == lattice_default(lattice, L, temp)
+        lattice = lattice_default(lattice, L, temp)
 
     return lattice
