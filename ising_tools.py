@@ -17,22 +17,34 @@ def create_lattice(L,p):
             else:
                 lattice[i, j] = -1
 
-    plt.ion()
-    plt.show()
-
-    lat_im = plt.imshow(lattice, cmap='cool', vmin=-1,vmax=1, interpolation='none')
     return lattice
 
 def ising_eq(val,temp, S):
-    E = (2*val)*S
+    E = ((2*val)*S)
     if E<0 or random.random() < math.exp((-1*E)/temp):
             val = val * -1
     else:
         val = val
     return val
 
+def ising_eq_neg(val,temp,S):
+    E = ((2*val)*S) - ((0.000000001*val)*S)
+    if E<0 or random.random() < math.exp((-1*E)/temp):
+            val = val * -1
+    else:
+        val = val
+    return val
 
-def lattice_default(lattice, L, temp):
+def ising_eq_pos(val,temp,S):
+   # temp_val = val + 0.000000001
+    E = ((2*val)*S) + ((0.000000001+val)*S)
+    if E<0 or random.random() < math.exp((-1*E)/temp):
+            val = val * -1
+    else:
+        val = val
+    return val
+
+def lattice_default(lattice, L, temp, bias):
     #This is the default lattice where boundaries are present
     for i in np.arange(0, (L**2)):
         x = random.randint(0, L-1)
@@ -54,12 +66,17 @@ def lattice_default(lattice, L, temp):
         else:
             S = lattice[x+1, y] + lattice[x-1, y] + lattice[x, y+1] + lattice[x, y-1]
 
-        lattice[x, y] = ising_eq(lattice[x, y], temp, S)
+        if bias == 'positive':
+            lattice[x,y] = ising_eq_pos(lattice[x,y], temp, S)
+        elif bias == 'negative':
+            lattice[x,y] = ising_eq_neg(lattice[x,y], temp, S)
+        else:
+            lattice[x,y] = ising_eq(lattice[x,y], temp, S)
 
     return lattice
 
 
-def lattice_donut(lattice, L, temp):
+def lattice_donut(lattice, L, temp, bias):
     # this is the lattice model to simulate no boundaries... or a pseudo-infinite lattice. This would create the shape of a donut.
     for i in np.arange(0,(L**2)):
         x = random.randint(0, L-1)
@@ -81,11 +98,16 @@ def lattice_donut(lattice, L, temp):
         else:
             S = lattice[x+1, y] + lattice[x-1, y] + lattice[x, y-1] + lattice[x, y+1]
         
-        lattice[x, y] = ising_eq(lattice[x, y], temp, S)
-        
+        if bias == 'positive':
+            lattice[x,y] = ising_eq_pos(lattice[x,y], temp, S)
+        elif bias == 'negative':
+            lattice[x,y] = ising_eq_neg(lattice[x,y], temp, S)
+        else:
+            lattice[x,y] = ising_eq(lattice[x,y], temp, S)
+
     return lattice
 
-def neg_lattice(lattice, L, temp):
+def neg_lattice(lattice, L, temp, bias):
     #simulates a lattice located within an all negative field
     for i in np.arange(0,L**2):
         x = random.int(0, L-1)
@@ -107,11 +129,16 @@ def neg_lattice(lattice, L, temp):
         else:
             S = lattice[x+1, y] + lattice[x-1, y] + lattice[x, y+1] + lattice[x, y-1]
 
-        lattice[x,y] = ising_eq(lattice[x,y], temp, S)
+        if bias == 'positive':
+            lattice[x,y] = ising_eq_pos(lattice[x,y], temp, S)
+        elif bias == 'negative':
+            lattice[x,y] = ising_eq_neg(lattice[x,y], temp, S)
+        else:
+            lattice[x,y] = ising_eq(lattice[x,y], temp, S)
     
     return lattice
 
-def pos_lattice(lattice, L, temp):
+def pos_lattice(lattice, L, temp, bias):
     #simulates a lattice located within an all positive field
     for i in np.arange(0,L**2):
         x = random.int(0, L-1)
@@ -132,12 +159,17 @@ def pos_lattice(lattice, L, temp):
             S = lattice[x+1, y] + lattice[x-1, y] + lattice[x, y-1] + 1
         else:
             S = lattice[x+1, y] + lattice[x-1, y] + lattice[x, y+1] + lattice[x, y-1]
-
-        lattice[x,y] = ising_eq(lattice[x,y], temp, S)
+        
+        if bias == 'positive':
+            lattice[x,y] = ising_eq_pos(lattice[x,y], temp, S)
+        elif bias == 'negative':
+            lattice[x,y] = ising_eq_neg(lattice[x,y], temp, S)
+        else:
+            lattice[x,y] = ising_eq(lattice[x,y], temp, S)
     
     return lattice
 
-def animate_lattice(trials, lattice, L, temp, lat_type, file_title):
+def animate_lattice(trials, lattice, L, temp, lat_type, file_title, bias):
     plt.ion()
     plt.show()
 
@@ -149,20 +181,26 @@ def animate_lattice(trials, lattice, L, temp, lat_type, file_title):
             plt.draw()
         if (t == 0) or (t % 100 == 0):
             plt.savefig(f"{file_title}-{t}")
-        lattice = update_lat(lattice, L, temp, lat_type)
+        lattice = update_lat(lattice, L, temp, lat_type, bias)
         plt.pause(.05)
         t += 1
     val = (np.sum(lattice)/(len(lattice)**2))
     return lattice, val
 
-def update_lat(lattice, L, temp, lat_type):
+def monte_lattice(trials, lattice, L, temp, lat_type, file_title, bias):
+    for i in np.arange(0, trials+1):
+        lattice = update_lat(lattice, L, temp, lat_type, bias)
+    val = (np.sum(lattice)/(len(lattice)**2))
+    return lattice, val
+
+def update_lat(lattice, L, temp, lat_type, bias):
     if lat_type == 'donut':
-        lattice = lattice_donut(lattice, L, temp)
+        lattice = lattice_donut(lattice, L, temp, bias)
     elif lat_type == 'positive':
-        lattice = pos_lattice(lattice, L, temp)
+        lattice = pos_lattice(lattice, L, temp, bias)
     elif lat_type == 'negative':
-        lattice = neg_lattice(lattice, L, temp)
+        lattice = neg_lattice(lattice, L, temp, bias)
     else:
-        lattice = lattice_default(lattice, L, temp)
+        lattice = lattice_default(lattice, L, temp, bias)
 
     return lattice
