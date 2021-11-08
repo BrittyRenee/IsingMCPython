@@ -14,7 +14,7 @@ x = 0 #allocation of our average magnetization
 
 # Then the lattice type: 'donut', 'positive', 'negative', or default
 lat_type = 'donut'
-bias = 'negative' # This variable indicates whether you want an almost negligable positive or negative bias to ensure results are either above or below the x-axis
+bias = 'negative' # This variable indicates whether you want a positive or negative bias to ensure results are either above or below the x-axis
 animate_lattice = False # True if you want to animate lattice. False if you don't want an animation.
 
 exp_runs = int(input("Please enter the number of experiments: "))
@@ -24,10 +24,16 @@ for i in list(range(exp_runs)):
     initial_lat = ising_tools.create_lattice(L,p)
     if animate_lattice == True:
         file_title = input("Please enter name for image files: ")
-        final_lat, val = ising_tools.animate_lattice(trials, initial_lat, L, temp, lat_type, file_title, bias)
+        final_lat, val = ising_tools.animate_lattice(trials, initial_lat, L, temp, lat_type, file_title)
     else:
-        final_lat, val = ising_tools.monte_lattice(trials, initial_lat, L, temp, lat_type, bias)
-    x = x + val
+        final_lat, val = ising_tools.monte_lattice(trials, initial_lat, L, temp, lat_type)
+    
+    if bias == 'positive':
+        x = x + abs(val)
+    elif bias == 'negative':
+        x = x + (abs(val)*-1)
+    else:
+        x = x + val
 
 avg_mag = x / exp_runs
 print(avg_mag)
