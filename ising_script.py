@@ -15,6 +15,7 @@ x = 0 #allocation of our average magnetization
 # Then the lattice type: 'donut', 'positive', 'negative', or default
 lat_type = 'donut'
 bias = 'negative' # This variable indicates whether you want a positive or negative bias to ensure results are either above or below the x-axis
+# bias currently does not work for the 'positive' and 'negative' type lattices
 animate_lattice = False # True if you want to animate lattice. False if you don't want an animation.
 
 exp_runs = int(input("Please enter the number of experiments: "))
